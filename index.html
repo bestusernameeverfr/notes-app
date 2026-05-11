@@ -1,92 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ultra Notes</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+<title>Ultra Notes</title>
 
-  <style>
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
+<script src="https://cdn.tailwindcss.com"></script>
 
-    ::-webkit-scrollbar-thumb {
-      background: #555;
-      border-radius: 999px;
-    }
+<style>
 
-    .glass {
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-  </style>
+body{
+  overflow:hidden;
+  transition:0.4s;
+}
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#555;
+  border-radius:999px;
+}
+
+.glass{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.noteCard{
+  transition:0.25s;
+}
+
+.noteCard:hover{
+  transform:translateY(-4px) scale(1.02);
+}
+
+.bouncy{
+  transition:0.2s;
+}
+
+.bouncy:hover{
+  transform:scale(1.1);
+}
+
+.bouncy:active{
+  transform:scale(0.95);
+}
+
+.fadeIn{
+  animation:fade 0.3s ease;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+</style>
 </head>
 
-<body class="bg-black text-white overflow-hidden">
+<body class="bg-zinc-950 text-white">
 
-<div id="app" class="h-screen w-screen flex">
+<div class="flex h-screen">
 
   <!-- SIDEBAR -->
-  <div class="w-[400px] border-r border-white/10 flex flex-col bg-zinc-950">
+  <div class="w-[380px] border-r border-white/10 flex flex-col">
 
-    <!-- HEADER -->
-    <div class="p-6 border-b border-white/10 flex items-center justify-between">
+    <!-- TOP -->
+    <div class="p-6 border-b border-white/10 flex justify-between items-center">
+
       <div>
-        <h1 class="text-4xl font-black">Ultra Notes</h1>
-        <p class="text-zinc-400">Future Notes App</p>
+        <h1 class="text-4xl font-black tracking-tight">
+          Ultra Notes
+        </h1>
+
+        <p class="text-zinc-400">
+          futuristic notes app
+        </p>
       </div>
 
       <button
-        onclick="toggleTheme()"
-        id="themeBtn"
-        class="glass p-3 rounded-2xl hover:scale-110 transition"
+        onclick="toggleSettings()"
+        class="glass p-3 rounded-2xl bouncy text-xl"
       >
-        🌙
+        ⚙️
       </button>
+
+    </div>
+
+    <!-- SETTINGS -->
+    <div
+      id="settingsPanel"
+      class="hidden p-4 border-b border-white/10 space-y-3"
+    >
+
+      <h2 class="font-bold text-lg">
+        Background Colors
+      </h2>
+
+      <div class="flex gap-3 flex-wrap">
+
+        <button
+          onclick="setTheme('#09090b')"
+          class="w-10 h-10 rounded-full bg-zinc-950 border border-white/10 bouncy"
+        ></button>
+
+        <button
+          onclick="setTheme('#0f172a')"
+          class="w-10 h-10 rounded-full bg-slate-900 bouncy"
+        ></button>
+
+        <button
+          onclick="setTheme('#1e1b4b')"
+          class="w-10 h-10 rounded-full bg-indigo-950 bouncy"
+        ></button>
+
+        <button
+          onclick="setTheme('#3f0d12')"
+          class="w-10 h-10 rounded-full bg-red-950 bouncy"
+        ></button>
+
+        <button
+          onclick="setTheme('#052e16')"
+          class="w-10 h-10 rounded-full bg-green-950 bouncy"
+        ></button>
+
+      </div>
+
     </div>
 
     <!-- SEARCH -->
     <div class="p-5">
+
       <input
         id="search"
-        oninput="renderNotes()"
         type="text"
         placeholder="Search notes..."
+        oninput="renderNotes()"
         class="w-full p-4 rounded-3xl bg-zinc-900 outline-none border border-white/10"
       />
+
     </div>
 
-    <!-- CREATE NOTE -->
-    <div class="px-5 pb-5 space-y-3">
-
-      <input
-        id="title"
-        type="text"
-        placeholder="Note title..."
-        class="w-full p-4 rounded-3xl bg-zinc-900 outline-none border border-white/10"
-      />
-
-      <input
-        id="tag"
-        type="text"
-        placeholder="Tag..."
-        class="w-full p-4 rounded-3xl bg-zinc-900 outline-none border border-white/10"
-      />
-
-      <textarea
-        id="content"
-        placeholder="Write your note..."
-        class="w-full h-32 p-4 rounded-3xl bg-zinc-900 outline-none border border-white/10 resize-none"
-      ></textarea>
+    <!-- CREATE -->
+    <div class="px-5">
 
       <button
-        onclick="createNote()"
-        class="w-full bg-blue-600 hover:bg-blue-700 transition p-4 rounded-3xl font-bold"
+        id="createBtn"
+        class="w-full bg-blue-600 hover:bg-blue-700 p-4 rounded-3xl font-bold bouncy shadow-2xl"
       >
-        + Create Note
+        + Create New Note
       </button>
 
     </div>
@@ -94,26 +166,30 @@
     <!-- NOTES -->
     <div
       id="notesContainer"
-      class="flex-1 overflow-y-auto px-5 pb-5 space-y-4"
+      class="flex-1 overflow-y-auto p-5 space-y-4"
     ></div>
 
   </div>
 
   <!-- MAIN -->
-  <div class="flex-1 bg-gradient-to-br from-zinc-950 via-black to-zinc-900 overflow-y-auto">
+  <div
+    id="mainView"
+    class="flex-1 flex items-center justify-center text-zinc-600"
+  >
 
-    <div id="mainView" class="h-full flex items-center justify-center text-zinc-600">
+    <div class="text-center fadeIn">
 
-      <div class="text-center">
-        <div class="text-8xl">📝</div>
-        <h2 class="text-5xl font-black mt-6">
-          No Note Selected
-        </h2>
-
-        <p class="mt-3 text-xl">
-          Create or open a note.
-        </p>
+      <div class="text-8xl">
+        📝
       </div>
+
+      <h2 class="text-5xl font-black mt-6">
+        No Note Selected
+      </h2>
+
+      <p class="mt-4 text-xl">
+        Create a note to begin writing
+      </p>
 
     </div>
 
@@ -123,88 +199,114 @@
 
 <script>
 
-let notes = JSON.parse(localStorage.getItem("ultraNotes")) || [];
-let selectedNote = null;
-let darkMode = true;
+let notes =
+  JSON.parse(localStorage.getItem("ultraNotes")) || [];
 
-function saveNotes() {
-  localStorage.setItem("ultraNotes", JSON.stringify(notes));
+let selectedNote = null;
+
+function saveNotes(){
+  localStorage.setItem(
+    "ultraNotes",
+    JSON.stringify(notes)
+  );
 }
 
-function createNote() {
+function createNote(){
 
-  const title = document.getElementById("title").value.trim();
-  const content = document.getElementById("content").value.trim();
-  const tag = document.getElementById("tag").value.trim();
+  const newNote = {
+    id:Date.now(),
+    title:"Untitled Note",
+    content:"",
+    starred:false,
+    pinned:false,
+    createdAt:new Date().toLocaleString()
+  };
 
-  if (!title) return;
-
-  notes.push({
-    id: Date.now(),
-    title,
-    content,
-    tag,
-    starred: false,
-    pinned: false,
-    createdAt: new Date().toLocaleString()
-  });
-
-  document.getElementById("title").value = "";
-  document.getElementById("content").value = "";
-  document.getElementById("tag").value = "";
+  notes.unshift(newNote);
 
   saveNotes();
+
   renderNotes();
+
+  openNote(newNote.id);
 }
 
-function renderNotes() {
+document
+  .getElementById("createBtn")
+  .addEventListener("click",createNote);
 
-  const container = document.getElementById("notesContainer");
-  const search = document.getElementById("search").value.toLowerCase();
+function renderNotes(){
 
-  let filtered = notes.filter(note =>
-    note.title.toLowerCase().includes(search) ||
-    note.content.toLowerCase().includes(search) ||
-    note.tag.toLowerCase().includes(search)
+  const container =
+    document.getElementById("notesContainer");
+
+  const search =
+    document.getElementById("search")
+    .value
+    .toLowerCase();
+
+  let filtered = notes.filter(note=>
+
+    note.title.toLowerCase().includes(search)
+    ||
+    note.content.toLowerCase().includes(search)
+
   );
 
-  // ALPHABETICAL SORT
-  filtered.sort((a, b) => a.title.localeCompare(b.title));
+  filtered.sort((a,b)=>
+    a.title.localeCompare(b.title)
+  );
 
-  // PINNED FIRST
-  filtered.sort((a, b) => b.pinned - a.pinned);
+  filtered.sort((a,b)=>
+    b.pinned - a.pinned
+  );
 
   container.innerHTML = "";
 
-  filtered.forEach(note => {
+  filtered.forEach(note=>{
 
-    const div = document.createElement("div");
+    const div =
+      document.createElement("div");
 
     div.className =
-      "glass rounded-[30px] p-5 hover:scale-[1.02] transition cursor-pointer";
+      "glass rounded-[30px] p-5 cursor-pointer noteCard fadeIn";
 
     div.innerHTML = `
+
       <div class="flex justify-between items-start">
 
         <div>
-          <h2 class="text-2xl font-bold">${note.title}</h2>
 
-          <p class="text-zinc-400 mt-1">
-            #${note.tag || "general"}
+          <h2 class="text-2xl font-bold">
+            ${note.title}
+          </h2>
+
+          <p class="text-zinc-500 text-sm mt-2">
+            ${note.createdAt}
           </p>
+
         </div>
 
         <div class="flex gap-2">
 
-          <button onclick="toggleStar(${note.id}); event.stopPropagation();">
+          <button
+            onclick="toggleStar(${note.id}); event.stopPropagation();"
+            class="bouncy text-xl"
+          >
             ${note.starred ? "⭐" : "☆"}
           </button>
 
-          <button onclick="togglePin(${note.id}); event.stopPropagation();">
+          <button
+            onclick="togglePin(${note.id}); event.stopPropagation();"
+            class="bouncy text-xl"
+          >
             ${note.pinned ? "📌" : "📍"}
           </button>
 
-          <button onclick="deleteNote(${note.id}); event.stopPropagation();">
+          <button
+            onclick="deleteNote(${note.id}); event.stopPropagation();"
+            class="bouncy text-xl"
+          >
             🗑️
           </button>
 
@@ -213,27 +315,28 @@ function renderNotes() {
       </div>
 
       <p class="mt-4 text-zinc-300 line-clamp-2">
-        ${note.content}
+        ${note.content || "Empty note"}
       </p>
 
-      <p class="text-xs text-zinc-500 mt-4">
-        ${note.createdAt}
-      </p>
     `;
 
-    div.onclick = () => openNote(note.id);
+    div.onclick = ()=>openNote(note.id);
 
     container.appendChild(div);
+
   });
+
 }
 
-function openNote(id) {
+function openNote(id){
 
-  selectedNote = notes.find(n => n.id === id);
+  selectedNote =
+    notes.find(n=>n.id===id);
 
-  document.getElementById("mainView").innerHTML = `
+  document.getElementById("mainView")
+  .innerHTML = `
 
-    <div class="p-10">
+    <div class="w-full h-full p-10 overflow-y-auto fadeIn">
 
       <input
         id="editTitle"
@@ -242,36 +345,21 @@ function openNote(id) {
         class="w-full bg-transparent text-6xl font-black outline-none border-b border-white/10 pb-5"
       />
 
-      <div class="mt-5 text-zinc-400">
-        #${selectedNote.tag || "general"}
-      </div>
-
       <textarea
         id="editContent"
         oninput="updateSelected()"
-        class="w-full h-[60vh] bg-transparent outline-none text-xl mt-8 resize-none"
+        placeholder="Start writing..."
+        class="w-full h-[70vh] bg-transparent outline-none text-xl mt-10 resize-none"
       >${selectedNote.content}</textarea>
-
-      <div class="mt-10 glass rounded-[35px] p-8">
-
-        <h2 class="text-3xl font-black mb-5">
-          Preview
-        </h2>
-
-        <div class="text-zinc-300 whitespace-pre-wrap">
-          ${selectedNote.content}
-        </div>
-
-      </div>
 
     </div>
 
   `;
 }
 
-function updateSelected() {
+function updateSelected(){
 
-  if (!selectedNote) return;
+  if(!selectedNote) return;
 
   selectedNote.title =
     document.getElementById("editTitle").value;
@@ -279,82 +367,90 @@ function updateSelected() {
   selectedNote.content =
     document.getElementById("editContent").value;
 
-  notes = notes.map(n =>
-    n.id === selectedNote.id ? selectedNote : n
+  notes = notes.map(n=>
+
+    n.id===selectedNote.id
+    ? selectedNote
+    : n
+
   );
 
   saveNotes();
+
   renderNotes();
 }
 
-function deleteNote(id) {
+function deleteNote(id){
 
-  notes = notes.filter(note => note.id !== id);
+  notes =
+    notes.filter(note=>note.id!==id);
 
-  if (selectedNote && selectedNote.id === id) {
+  saveNotes();
 
-    selectedNote = null;
+  renderNotes();
 
-    document.getElementById("mainView").innerHTML = `
-      <div class="h-full flex items-center justify-center text-zinc-600">
+  if(selectedNote?.id===id){
 
-        <div class="text-center">
-          <div class="text-8xl">📝</div>
+    document.getElementById("mainView")
+    .innerHTML = `
 
-          <h2 class="text-5xl font-black mt-6">
-            No Note Selected
-          </h2>
+      <div class="text-center fadeIn">
+
+        <div class="text-8xl">
+          📝
         </div>
 
+        <h2 class="text-5xl font-black mt-6">
+          No Note Selected
+        </h2>
+
       </div>
+
     `;
   }
-
-  saveNotes();
-  renderNotes();
 }
 
-function toggleStar(id) {
+function toggleStar(id){
 
-  notes = notes.map(note =>
-    note.id === id
-      ? { ...note, starred: !note.starred }
-      : note
+  notes = notes.map(note=>
+
+    note.id===id
+    ? {...note,starred:!note.starred}
+    : note
+
   );
 
   saveNotes();
+
   renderNotes();
 }
 
-function togglePin(id) {
+function togglePin(id){
 
-  notes = notes.map(note =>
-    note.id === id
-      ? { ...note, pinned: !note.pinned }
-      : note
+  notes = notes.map(note=>
+
+    note.id===id
+    ? {...note,pinned:!note.pinned}
+    : note
+
   );
 
   saveNotes();
+
   renderNotes();
 }
 
-function toggleTheme() {
+function toggleSettings(){
 
-  darkMode = !darkMode;
+  const panel =
+    document.getElementById("settingsPanel");
 
-  if (darkMode) {
-    document.body.className =
-      "bg-black text-white overflow-hidden";
+  panel.classList.toggle("hidden");
+}
 
-    document.getElementById("themeBtn").innerHTML = "🌙";
-  }
+function setTheme(color){
 
-  else {
-    document.body.className =
-      "bg-white text-black overflow-hidden";
-
-    document.getElementById("themeBtn").innerHTML = "☀️";
-  }
+  document.body.style.background = color;
 }
 
 renderNotes();
