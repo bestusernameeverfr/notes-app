@@ -10,73 +10,83 @@
 
 <style>
 
-/* 🌟 GLOBAL TEXT FIX (READABILITY UPGRADE) */
 * {
   -webkit-font-smoothing: antialiased;
-  text-shadow:
-    0px 1px 1px rgba(0,0,0,0.25),
-    0px 0px 2px rgba(0,0,0,0.15);
+  -webkit-text-stroke: 0.25px rgba(0,0,0,0.25);
+  text-shadow: 0px 1px 2px rgba(0,0,0,0.25);
 }
 
 body{
+  margin:0;
   overflow:hidden;
-  transition:0.5s;
   background:linear-gradient(135deg,#ff9a9e,#fad0c4);
 }
 
-::-webkit-scrollbar{
-  width:8px;
+/* animations */
+.fadeIn{
+  animation:fade 0.25s ease;
 }
 
-::-webkit-scrollbar-thumb{
-  background:rgba(255,255,255,0.4);
-  border-radius:999px;
+@keyframes fade{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
 }
 
 .glass{
   background:rgba(255,255,255,0.18);
   backdrop-filter:blur(18px);
   border:1px solid rgba(255,255,255,0.2);
-  box-shadow:0 8px 30px rgba(0,0,0,0.1);
 }
 
 .noteCard{
-  transition:0.25s;
-}
-
-.noteCard:hover{
-  transform:translateY(-5px) scale(1.02);
-}
-
-.bouncy{
   transition:0.2s;
 }
 
-.bouncy:hover{
-  transform:scale(1.08);
+.noteCard:hover{
+  transform:scale(1.02);
 }
 
-.bouncy:active{
-  transform:scale(0.94);
+button{
+  transition:0.2s;
 }
 
-.fadeIn{
-  animation:fade 0.3s ease;
+button:active{
+  transform:scale(0.96);
 }
 
-@keyframes fade{
-  from{
-    opacity:0;
-    transform:translateY(12px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
+/* layout states */
+#sidebar{
+  width:380px;
+  height:100vh;
+  position:absolute;
+  left:0;
+  top:0;
+  overflow-y:auto;
+  border-right:1px solid rgba(255,255,255,0.2);
 }
 
-textarea{
-  caret-color:white;
+#editor{
+  display:none;
+  height:100vh;
+  width:100vw;
+  padding:60px;
+  box-sizing:border-box;
+}
+
+.fullscreen #sidebar{
+  display:none;
+}
+
+.fullscreen #editor{
+  display:block;
+}
+
+textarea,input{
+  outline:none;
+  border:none;
+  background:transparent;
+  width:100%;
+  color:white;
 }
 
 </style>
@@ -84,139 +94,42 @@ textarea{
 
 <body class="text-white">
 
-<div class="flex h-screen">
+<div id="app">
 
   <!-- SIDEBAR -->
-  <div class="w-[380px] glass border-r border-white/10 flex flex-col">
+  <div id="sidebar" class="glass">
 
-    <!-- HEADER -->
-    <div class="p-6 flex justify-between items-center border-b border-white/10">
-
-      <div>
-        <h1 class="text-4xl font-black tracking-tight">
-          Ultra Notes ✨
-        </h1>
-
-        <p class="text-white/70">
-          cute aesthetic notes app
-        </p>
-      </div>
-
-      <button
-        onclick="toggleSettings()"
-        class="glass p-3 rounded-2xl bouncy text-xl"
-      >
-        ⚙️
-      </button>
-
+    <div class="p-6 border-b border-white/10 flex justify-between items-center">
+      <h1 class="text-4xl font-black">Ultra Notes ✨</h1>
     </div>
 
-    <!-- SETTINGS -->
-    <div
-      id="settingsPanel"
-      class="hidden p-5 border-b border-white/10"
-    >
-
-      <h2 class="font-bold text-lg mb-4">
-        Choose Background ✨
-      </h2>
-
-      <div class="flex gap-3 flex-wrap">
-
-        <button
-          onclick="setTheme('linear-gradient(135deg,#ff9a9e,#fad0c4)')"
-          class="w-12 h-12 rounded-full bouncy"
-          style="background:linear-gradient(135deg,#ff9a9e,#fad0c4)"
-        ></button>
-
-        <button
-          onclick="setTheme('linear-gradient(135deg,#a18cd1,#fbc2eb)')"
-          class="w-12 h-12 rounded-full bouncy"
-          style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"
-        ></button>
-
-        <button
-          onclick="setTheme('linear-gradient(135deg,#84fab0,#8fd3f4)')"
-          class="w-12 h-12 rounded-full bouncy"
-          style="background:linear-gradient(135deg,#84fab0,#8fd3f4)"
-        ></button>
-
-        <button
-          onclick="setTheme('linear-gradient(135deg,#fccb90,#d57eeb)')"
-          class="w-12 h-12 rounded-full bouncy"
-          style="background:linear-gradient(135deg,#fccb90,#d57eeb)"
-        ></button>
-
-        <button
-          onclick="setTheme('linear-gradient(135deg,#f6d365,#fda085)')"
-          class="w-12 h-12 rounded-full bouncy"
-          style="background:linear-gradient(135deg,#f6d365,#fda085)"
-        ></button>
-
-        <button
-          onclick="setTheme('linear-gradient(135deg,#ffdde1,#ee9ca7)')"
-          class="w-12 h-12 rounded-full bouncy"
-          style="background:linear-gradient(135deg,#ffdde1,#ee9ca7)"
-        ></button>
-
-      </div>
-
-    </div>
-
-    <!-- SEARCH -->
     <div class="p-5">
-
-      <input
-        id="search"
-        type="text"
-        placeholder="Search notes..."
-        oninput="renderNotes()"
-        class="w-full p-4 rounded-3xl bg-white/20 outline-none placeholder-white/60"
-      />
-
-    </div>
-
-    <!-- CREATE -->
-    <div class="px-5">
-
-      <button
-        id="createBtn"
-        class="w-full bg-white text-pink-500 hover:bg-pink-100 transition p-4 rounded-3xl font-black text-lg bouncy"
-      >
+      <button id="createBtn"
+        class="w-full bg-white text-pink-500 p-4 rounded-3xl font-black">
         + Create New Note
       </button>
-
     </div>
 
-    <!-- NOTES -->
-    <div
-      id="notesContainer"
-      class="flex-1 overflow-y-auto p-5 space-y-4"
-    ></div>
+    <div id="notesContainer" class="p-5 space-y-4"></div>
 
   </div>
 
-  <!-- MAIN -->
-  <div
-    id="mainView"
-    class="flex-1 flex items-center justify-center"
-  >
+  <!-- FULLSCREEN EDITOR -->
+  <div id="editor" class="fadeIn">
 
-    <div class="text-center fadeIn text-white/80">
+    <input
+      id="title"
+      placeholder="Untitled Note"
+      class="text-6xl font-black mb-10"
+      oninput="updateNote()"
+    />
 
-      <div class="text-8xl">
-        🌸
-      </div>
-
-      <h2 class="text-5xl font-black mt-6">
-        No Note Selected
-      </h2>
-
-      <p class="mt-4 text-xl">
-        Create a cute new note ✨
-      </p>
-
-    </div>
+    <textarea
+      id="content"
+      class="h-[75vh] text-2xl resize-none"
+      oninput="updateNote()"
+      placeholder="Start writing..."
+    ></textarea>
 
   </div>
 
@@ -224,160 +137,98 @@ textarea{
 
 <script>
 
-/* SAME JS AS BEFORE (UNCHANGED) */
-
-let notes =
-  JSON.parse(localStorage.getItem("ultraNotes")) || [];
-
+let notes = JSON.parse(localStorage.getItem("ultraNotes")) || [];
 let selectedNote = null;
 
 function saveNotes(){
   localStorage.setItem("ultraNotes", JSON.stringify(notes));
 }
 
-function createNote(){
-
-  const newNote = {
+/* CREATE NOTE */
+document.getElementById("createBtn").addEventListener("click", ()=>{
+  const note = {
     id:Date.now(),
-    title:"Untitled Note",
+    title:"",
     content:"",
-    starred:false,
-    pinned:false,
-    createdAt:new Date().toLocaleString()
+    updatedAt:Date.now()
   };
 
-  notes.unshift(newNote);
-
+  notes.unshift(note);
   saveNotes();
   renderNotes();
-  openNote(newNote.id);
-}
+  openNote(note.id);
+});
 
-document
-  .getElementById("createBtn")
-  .addEventListener("click",createNote);
-
+/* RENDER SIDEBAR */
 function renderNotes(){
 
-  const container =
-    document.getElementById("notesContainer");
-
-  const search =
-    document.getElementById("search")
-    .value
-    .toLowerCase();
-
-  let filtered = notes.filter(note=>
-
-    note.title.toLowerCase().includes(search)
-    ||
-    note.content.toLowerCase().includes(search)
-
-  );
-
-  filtered.sort((a,b)=>
-    a.title.localeCompare(b.title)
-  );
-
-  filtered.sort((a,b)=>
-    b.pinned - a.pinned
-  );
-
+  const container = document.getElementById("notesContainer");
   container.innerHTML = "";
 
-  filtered.forEach(note=>{
+  notes.forEach(note=>{
 
-    const div =
-      document.createElement("div");
-
-    div.className =
-      "glass rounded-[30px] p-5 cursor-pointer noteCard fadeIn";
+    const div = document.createElement("div");
+    div.className = "glass p-5 rounded-3xl cursor-pointer noteCard fadeIn";
 
     div.innerHTML = `
-
-      <div class="flex justify-between items-start">
-
-        <div>
-
-          <h2 class="text-2xl font-black">
-            ${note.title}
-          </h2>
-
-          <p class="text-white/60 text-sm mt-2">
-            ${note.createdAt}
-          </p>
-
-        </div>
-
+      <div class="text-2xl font-black">
+        ${note.title.trim() === "" ? "Untitled Note" : note.title}
       </div>
-
     `;
 
     div.onclick = ()=>openNote(note.id);
 
     container.appendChild(div);
-
   });
-
 }
 
+/* OPEN FULLSCREEN EDITOR */
 function openNote(id){
 
-  selectedNote =
-    notes.find(n=>n.id===id);
+  selectedNote = notes.find(n=>n.id===id);
 
-  document.getElementById("mainView")
-  .innerHTML = `
+  document.body.classList.add("fullscreen");
 
-    <div class="w-full h-full p-10 overflow-y-auto fadeIn">
+  document.getElementById("title").value = selectedNote.title;
+  document.getElementById("content").value = selectedNote.content;
 
-      <input
-        id="editTitle"
-        value="${selectedNote.title}"
-        oninput="updateSelected()"
-        class="w-full bg-transparent text-6xl font-black outline-none border-b border-white/20 pb-5"
-      />
-
-      <textarea
-        id="editContent"
-        oninput="updateSelected()"
-        class="w-full h-[70vh] bg-transparent outline-none text-2xl mt-10 resize-none"
-      >${selectedNote.content}</textarea>
-
-    </div>
-
-  `;
+  document.getElementById("title").focus();
 }
 
-function updateSelected(){
+/* EXIT FULLSCREEN (ESC KEY) */
+document.addEventListener("keydown",(e)=>{
+
+  if(e.key === "Escape"){
+    closeEditor();
+  }
+});
+
+function closeEditor(){
+
+  document.body.classList.remove("fullscreen");
+  selectedNote = null;
+  renderNotes();
+}
+
+/* UPDATE NOTE */
+function updateNote(){
 
   if(!selectedNote) return;
 
   selectedNote.title =
-    document.getElementById("editTitle").value;
+    document.getElementById("title").value;
 
   selectedNote.content =
-    document.getElementById("editContent").value;
+    document.getElementById("content").value;
 
-  notes = notes.map(n=>
+  selectedNote.updatedAt = Date.now();
 
-    n.id===selectedNote.id
-    ? selectedNote
-    : n
-
+  notes = notes.map(n =>
+    n.id === selectedNote.id ? selectedNote : n
   );
 
   saveNotes();
   renderNotes();
-}
-
-function toggleSettings(){
-  document.getElementById("settingsPanel")
-  .classList.toggle("hidden");
-}
-
-function setTheme(color){
-  document.body.style.background = color;
 }
 
 renderNotes();
