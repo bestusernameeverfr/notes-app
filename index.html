@@ -10,13 +10,11 @@
 
 <style>
 
-/* CLEAN BASE */
 * {
   -webkit-font-smoothing: antialiased;
   -webkit-text-stroke: 0.4px rgba(0,0,0,0.25);
 }
 
-/* BACKGROUND */
 body{
   margin:0;
   overflow:hidden;
@@ -25,7 +23,6 @@ body{
   color:white;
 }
 
-/* LAYOUT */
 #app{
   height:100vh;
   width:100vw;
@@ -70,7 +67,6 @@ body{
   pointer-events:auto;
 }
 
-/* NOTES */
 .noteCard{
   transition:0.2s;
 }
@@ -79,7 +75,6 @@ body{
   transform:scale(1.02);
 }
 
-/* SAVE */
 #saveStatus{
   position:fixed;
   bottom:20px;
@@ -91,7 +86,6 @@ body{
   transition:0.3s;
 }
 
-/* SETTINGS PANEL FIX */
 #settingsPanel{
   display:none;
   margin-top:10px;
@@ -101,7 +95,6 @@ body{
   display:block;
 }
 
-/* SETTINGS BUTTONS */
 #settingsPanel button{
   margin:5px;
   padding:8px 12px;
@@ -145,7 +138,6 @@ textarea,input{
       </button>
     </div>
 
-    <!-- SETTINGS -->
     <div id="settingsPanel" class="p-4 border-b border-white/10">
       <button onclick="setTheme('pink')">💗 Pink</button>
       <button onclick="setTheme('blue')">💙 Blue</button>
@@ -197,12 +189,11 @@ let notes = JSON.parse(localStorage.getItem("ultraNotes")) || [];
 let selectedNote = null;
 let saveTimeout;
 
-/* SETTINGS TOGGLE FIX */
+/* SETTINGS */
 function toggleSettings(){
   document.getElementById("settingsPanel").classList.toggle("show");
 }
 
-/* THEMES */
 function setTheme(type){
 
   const themes = {
@@ -216,17 +207,16 @@ function setTheme(type){
   document.body.style.background = themes[type];
 }
 
-/* SAVE UI */
+/* SAVE */
+function saveNotes(){
+  localStorage.setItem("ultraNotes", JSON.stringify(notes));
+}
+
 function showSave(msg){
   const el = document.getElementById("saveStatus");
   el.innerText = msg;
   el.style.opacity = 1;
   setTimeout(()=>el.style.opacity=0,800);
-}
-
-/* STORAGE */
-function saveNotes(){
-  localStorage.setItem("ultraNotes", JSON.stringify(notes));
 }
 
 /* AUTO SAVE */
@@ -281,6 +271,21 @@ function togglePin(id,e){
   renderNotes();
 }
 
+/* 🆕 DELETE NOTE */
+function deleteNote(id, e){
+  e.stopPropagation();
+
+  notes = notes.filter(n => n.id !== id);
+
+  if(selectedNote && selectedNote.id === id){
+    selectedNote = null;
+    document.body.classList.remove("fullscreen");
+  }
+
+  saveNotes();
+  renderNotes();
+}
+
 /* RENDER */
 function renderNotes(){
 
@@ -306,14 +311,20 @@ function renderNotes(){
     div.className = "p-5 rounded-3xl bg-white/20 cursor-pointer noteCard";
 
     div.innerHTML = `
-      <div class="flex justify-between">
+      <div class="flex justify-between items-center">
         <div class="text-xl font-black">
           ${note.title || "Untitled Note"}
         </div>
 
-        <button onclick="togglePin(${note.id}, event)">
-          ${note.pinned ? "📌" : "📍"}
-        </button>
+        <div class="flex gap-2">
+          <button onclick="togglePin(${note.id}, event)">
+            ${note.pinned ? "📌" : "📍"}
+          </button>
+
+          <button onclick="deleteNote(${note.id}, event)">
+            🗑️
+          </button>
+        </div>
       </div>
     `;
 
