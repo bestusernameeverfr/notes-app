@@ -28,7 +28,6 @@ body{
   position:relative;
 }
 
-/* SIDEBAR */
 #sidebar{
   width:380px;
   height:100vh;
@@ -42,7 +41,6 @@ body{
   transition:0.3s;
 }
 
-/* EDITOR */
 #editor{
   position:absolute;
   inset:0;
@@ -108,16 +106,6 @@ textarea,input{
 button{ transition:0.2s; }
 button:active{ transform:scale(0.96); }
 
-/* SETTINGS PANEL */
-#settingsPanel{
-  display:none;
-  padding:15px;
-}
-
-#settingsPanel.show{
-  display:block;
-}
-
 </style>
 </head>
 
@@ -128,7 +116,6 @@ button:active{ transform:scale(0.96); }
   <!-- SIDEBAR -->
   <div id="sidebar">
 
-    <!-- HEADER (RESTORED SETTINGS BUTTON) -->
     <div class="p-6 border-b border-white/10 flex justify-between items-center">
       <h1 class="text-4xl font-black">Ultra Notes ✨</h1>
 
@@ -137,30 +124,11 @@ button:active{ transform:scale(0.96); }
       </button>
     </div>
 
-    <!-- SETTINGS -->
-    <div id="settingsPanel" class="border-b border-white/10">
-
-      <p class="font-bold mb-3">Backgrounds</p>
-
-      <div class="flex gap-2 flex-wrap">
-
-        <button onclick="setTheme('linear-gradient(135deg,#ff9a9e,#fad0c4)')"
-        class="w-8 h-8 rounded-full"
-        style="background:linear-gradient(135deg,#ff9a9e,#fad0c4)"></button>
-
-        <button onclick="setTheme('linear-gradient(135deg,#a18cd1,#fbc2eb)')"
-        class="w-8 h-8 rounded-full"
-        style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"></button>
-
-        <button onclick="setTheme('linear-gradient(135deg,#84fab0,#8fd3f4)')"
-        class="w-8 h-8 rounded-full"
-        style="background:linear-gradient(135deg,#84fab0,#8fd3f4)"></button>
-
-      </div>
-
+    <div id="settingsPanel" class="p-4 hidden border-b border-white/10">
+      <button onclick="setTheme('linear-gradient(135deg,#ff9a9e,#fad0c4)')">Pink</button>
+      <button onclick="setTheme('linear-gradient(135deg,#84fab0,#8fd3f4)')">Blue</button>
     </div>
 
-    <!-- SEARCH -->
     <div class="p-5">
       <input id="search"
         oninput="renderNotes()"
@@ -168,7 +136,6 @@ button:active{ transform:scale(0.96); }
         class="w-full p-4 rounded-3xl bg-white/20" />
     </div>
 
-    <!-- CREATE -->
     <div class="p-5">
       <button id="createBtn"
         class="w-full bg-white text-pink-500 p-4 rounded-3xl font-black">
@@ -212,8 +179,7 @@ let saveTimeout;
 
 /* SETTINGS */
 function toggleSettings(){
-  document.getElementById("settingsPanel")
-    .classList.toggle("show");
+  document.getElementById("settingsPanel").classList.toggle("hidden");
 }
 
 function setTheme(bg){
@@ -245,6 +211,7 @@ function autoSave(){
 
     selectedNote.title = document.getElementById("title").value;
     selectedNote.content = document.getElementById("content").value;
+    selectedNote.updatedAt = Date.now(); // 🔥 IMPORTANT FIX
 
     notes = notes.map(n =>
       n.id === selectedNote.id ? selectedNote : n
@@ -264,7 +231,8 @@ document.getElementById("createBtn").onclick = ()=>{
     id:Date.now(),
     title:"",
     content:"",
-    pinned:false
+    pinned:false,
+    updatedAt:Date.now()
   };
 
   notes.unshift(note);
@@ -276,13 +244,15 @@ document.getElementById("createBtn").onclick = ()=>{
 /* PIN */
 function togglePin(id,e){
   e.stopPropagation();
+
   const note = notes.find(n=>n.id===id);
   note.pinned = !note.pinned;
+
   saveNotes();
   renderNotes();
 }
 
-/* RENDER */
+/* RENDER (FIXED SORTING) */
 function renderNotes(){
 
   const container = document.getElementById("notesContainer");
@@ -291,7 +261,15 @@ function renderNotes(){
   container.innerHTML = "";
 
   let sorted = [...notes];
-  sorted.sort((a,b)=>b.pinned - a.pinned);
+
+  /* 🔥 KEY FIX:
+     pinned first, THEN most recently edited */
+  sorted.sort((a,b)=>{
+    if(a.pinned !== b.pinned){
+      return b.pinned - a.pinned;
+    }
+    return b.updatedAt - a.updatedAt;
+  });
 
   sorted.forEach(note=>{
 
@@ -299,8 +277,14 @@ function renderNotes(){
     div.className = "glass p-5 rounded-3xl cursor-pointer noteCard fadeIn";
 
     div.innerHTML = `
-      <div class="text-2xl font-black">
-        ${note.title || "Untitled Note"}
+      <div class="flex justify-between items-center">
+        <div class="text-2xl font-black">
+          ${note.title || "Untitled Note"}
+        </div>
+
+        <button onclick="togglePin(${note.id}, event)">
+          ${note.pinned ? "📌" : "📍"}
+        </button>
       </div>
     `;
 
