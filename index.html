@@ -12,7 +12,8 @@
 
 body{
   overflow:hidden;
-  transition:0.4s;
+  transition:0.5s;
+  background:linear-gradient(135deg,#ff9a9e,#fad0c4);
 }
 
 ::-webkit-scrollbar{
@@ -20,14 +21,15 @@ body{
 }
 
 ::-webkit-scrollbar-thumb{
-  background:#555;
+  background:rgba(255,255,255,0.4);
   border-radius:999px;
 }
 
 .glass{
-  background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.18);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,0.2);
+  box-shadow:0 8px 30px rgba(0,0,0,0.1);
 }
 
 .noteCard{
@@ -35,7 +37,7 @@ body{
 }
 
 .noteCard:hover{
-  transform:translateY(-4px) scale(1.02);
+  transform:translateY(-5px) scale(1.02);
 }
 
 .bouncy{
@@ -43,11 +45,11 @@ body{
 }
 
 .bouncy:hover{
-  transform:scale(1.1);
+  transform:scale(1.08);
 }
 
 .bouncy:active{
-  transform:scale(0.95);
+  transform:scale(0.94);
 }
 
 .fadeIn{
@@ -57,7 +59,7 @@ body{
 @keyframes fade{
   from{
     opacity:0;
-    transform:translateY(10px);
+    transform:translateY(12px);
   }
   to{
     opacity:1;
@@ -65,26 +67,30 @@ body{
   }
 }
 
+textarea{
+  caret-color:white;
+}
+
 </style>
 </head>
 
-<body class="bg-zinc-950 text-white">
+<body class="text-white">
 
 <div class="flex h-screen">
 
   <!-- SIDEBAR -->
-  <div class="w-[380px] border-r border-white/10 flex flex-col">
+  <div class="w-[380px] glass border-r border-white/10 flex flex-col">
 
-    <!-- TOP -->
-    <div class="p-6 border-b border-white/10 flex justify-between items-center">
+    <!-- HEADER -->
+    <div class="p-6 flex justify-between items-center border-b border-white/10">
 
       <div>
         <h1 class="text-4xl font-black tracking-tight">
-          Ultra Notes
+          Ultra Notes ✨
         </h1>
 
-        <p class="text-zinc-400">
-          futuristic notes app
+        <p class="text-white/70">
+          cute aesthetic notes app
         </p>
       </div>
 
@@ -100,38 +106,49 @@ body{
     <!-- SETTINGS -->
     <div
       id="settingsPanel"
-      class="hidden p-4 border-b border-white/10 space-y-3"
+      class="hidden p-5 border-b border-white/10"
     >
 
-      <h2 class="font-bold text-lg">
-        Background Colors
+      <h2 class="font-bold text-lg mb-4">
+        Choose Background ✨
       </h2>
 
       <div class="flex gap-3 flex-wrap">
 
         <button
-          onclick="setTheme('#09090b')"
-          class="w-10 h-10 rounded-full bg-zinc-950 border border-white/10 bouncy"
+          onclick="setTheme('linear-gradient(135deg,#ff9a9e,#fad0c4)')"
+          class="w-12 h-12 rounded-full bouncy"
+          style="background:linear-gradient(135deg,#ff9a9e,#fad0c4)"
         ></button>
 
         <button
-          onclick="setTheme('#0f172a')"
-          class="w-10 h-10 rounded-full bg-slate-900 bouncy"
+          onclick="setTheme('linear-gradient(135deg,#a18cd1,#fbc2eb)')"
+          class="w-12 h-12 rounded-full bouncy"
+          style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"
         ></button>
 
         <button
-          onclick="setTheme('#1e1b4b')"
-          class="w-10 h-10 rounded-full bg-indigo-950 bouncy"
+          onclick="setTheme('linear-gradient(135deg,#84fab0,#8fd3f4)')"
+          class="w-12 h-12 rounded-full bouncy"
+          style="background:linear-gradient(135deg,#84fab0,#8fd3f4)"
         ></button>
 
         <button
-          onclick="setTheme('#3f0d12')"
-          class="w-10 h-10 rounded-full bg-red-950 bouncy"
+          onclick="setTheme('linear-gradient(135deg,#fccb90,#d57eeb)')"
+          class="w-12 h-12 rounded-full bouncy"
+          style="background:linear-gradient(135deg,#fccb90,#d57eeb)"
         ></button>
 
         <button
-          onclick="setTheme('#052e16')"
-          class="w-10 h-10 rounded-full bg-green-950 bouncy"
+          onclick="setTheme('linear-gradient(135deg,#f6d365,#fda085)')"
+          class="w-12 h-12 rounded-full bouncy"
+          style="background:linear-gradient(135deg,#f6d365,#fda085)"
+        ></button>
+
+        <button
+          onclick="setTheme('linear-gradient(135deg,#ffdde1,#ee9ca7)')"
+          class="w-12 h-12 rounded-full bouncy"
+          style="background:linear-gradient(135deg,#ffdde1,#ee9ca7)"
         ></button>
 
       </div>
@@ -146,7 +163,7 @@ body{
         type="text"
         placeholder="Search notes..."
         oninput="renderNotes()"
-        class="w-full p-4 rounded-3xl bg-zinc-900 outline-none border border-white/10"
+        class="w-full p-4 rounded-3xl bg-white/20 outline-none placeholder-white/60"
       />
 
     </div>
@@ -156,7 +173,7 @@ body{
 
       <button
         id="createBtn"
-        class="w-full bg-blue-600 hover:bg-blue-700 p-4 rounded-3xl font-bold bouncy shadow-2xl"
+        class="w-full bg-white text-pink-500 hover:bg-pink-100 transition p-4 rounded-3xl font-black text-lg bouncy"
       >
         + Create New Note
       </button>
@@ -174,13 +191,13 @@ body{
   <!-- MAIN -->
   <div
     id="mainView"
-    class="flex-1 flex items-center justify-center text-zinc-600"
+    class="flex-1 flex items-center justify-center"
   >
 
-    <div class="text-center fadeIn">
+    <div class="text-center fadeIn text-white/80">
 
       <div class="text-8xl">
-        📝
+        🌸
       </div>
 
       <h2 class="text-5xl font-black mt-6">
@@ -188,7 +205,7 @@ body{
       </h2>
 
       <p class="mt-4 text-xl">
-        Create a note to begin writing
+        Create a cute new note ✨
       </p>
 
     </div>
@@ -205,6 +222,7 @@ let notes =
 let selectedNote = null;
 
 function saveNotes(){
+
   localStorage.setItem(
     "ultraNotes",
     JSON.stringify(notes)
@@ -277,11 +295,11 @@ function renderNotes(){
 
         <div>
 
-          <h2 class="text-2xl font-bold">
+          <h2 class="text-2xl font-black">
             ${note.title}
           </h2>
 
-          <p class="text-zinc-500 text-sm mt-2">
+          <p class="text-white/60 text-sm mt-2">
             ${note.createdAt}
           </p>
 
@@ -314,8 +332,8 @@ function renderNotes(){
 
       </div>
 
-      <p class="mt-4 text-zinc-300 line-clamp-2">
-        ${note.content || "Empty note"}
+      <p class="mt-4 text-pink-100 font-medium">
+        Click to open note ✨
       </p>
 
     `;
@@ -342,14 +360,14 @@ function openNote(id){
         id="editTitle"
         value="${selectedNote.title}"
         oninput="updateSelected()"
-        class="w-full bg-transparent text-6xl font-black outline-none border-b border-white/10 pb-5"
+        class="w-full bg-transparent text-6xl font-black outline-none border-b border-white/20 pb-5 placeholder-white/50"
       />
 
       <textarea
         id="editContent"
         oninput="updateSelected()"
-        placeholder="Start writing..."
-        class="w-full h-[70vh] bg-transparent outline-none text-xl mt-10 resize-none"
+        placeholder="Start writing your thoughts..."
+        class="w-full h-[70vh] bg-transparent outline-none text-2xl mt-10 resize-none placeholder-white/50"
       >${selectedNote.content}</textarea>
 
     </div>
@@ -394,10 +412,10 @@ function deleteNote(id){
     document.getElementById("mainView")
     .innerHTML = `
 
-      <div class="text-center fadeIn">
+      <div class="text-center fadeIn text-white/80">
 
         <div class="text-8xl">
-          📝
+          🌸
         </div>
 
         <h2 class="text-5xl font-black mt-6">
@@ -442,15 +460,18 @@ function togglePin(id){
 
 function toggleSettings(){
 
-  const panel =
-    document.getElementById("settingsPanel");
-
-  panel.classList.toggle("hidden");
+  document
+    .getElementById("settingsPanel")
+    .classList.toggle("hidden");
 }
 
 function setTheme(color){
 
-  document.body.style.background = color;
+  document.body.style.background =
+    color;
+
+  document.body.style.backgroundAttachment =
+    "fixed";
 }
 
 renderNotes();
