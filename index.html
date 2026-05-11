@@ -19,24 +19,41 @@
 body{
   margin:0;
   overflow:hidden;
+  transition:0.4s;
   background:linear-gradient(135deg,#ff9a9e,#fad0c4);
 }
 
-/* animations */
-.fadeIn{
-  animation:fade 0.25s ease;
+#app{
+  height:100vh;
+  width:100vw;
+  position:relative;
 }
 
-@keyframes fade{
-  from{opacity:0; transform:translateY(10px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-.glass{
-  background:rgba(255,255,255,0.18);
+/* SIDEBAR */
+#sidebar{
+  width:380px;
+  height:100vh;
+  position:absolute;
+  left:0;
+  top:0;
+  overflow-y:auto;
+  background:rgba(255,255,255,0.15);
   backdrop-filter:blur(18px);
-  border:1px solid rgba(255,255,255,0.2);
+  border-right:1px solid rgba(255,255,255,0.2);
 }
+
+/* EDITOR */
+#editor{
+  display:none;
+  position:absolute;
+  inset:0;
+  padding:60px;
+  box-sizing:border-box;
+}
+
+/* fullscreen */
+.fullscreen #sidebar{ display:none; }
+.fullscreen #editor{ display:block; }
 
 .noteCard{
   transition:0.2s;
@@ -46,47 +63,37 @@ body{
   transform:scale(1.02);
 }
 
-button{
-  transition:0.2s;
+.fadeIn{
+  animation:fade 0.25s ease;
 }
 
-button:active{
-  transform:scale(0.96);
+@keyframes fade{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:translateY(0);}
 }
 
-/* layout states */
-#sidebar{
-  width:380px;
-  height:100vh;
-  position:absolute;
-  left:0;
-  top:0;
-  overflow-y:auto;
-  border-right:1px solid rgba(255,255,255,0.2);
-}
-
-#editor{
-  display:none;
-  height:100vh;
-  width:100vw;
-  padding:60px;
-  box-sizing:border-box;
-}
-
-.fullscreen #sidebar{
-  display:none;
-}
-
-.fullscreen #editor{
-  display:block;
-}
+button{ transition:0.2s; }
+button:active{ transform:scale(0.96); }
 
 textarea,input{
   outline:none;
-  border:none;
   background:transparent;
   width:100%;
   color:white;
+}
+
+.glass{
+  background:rgba(255,255,255,0.18);
+  backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,0.2);
+}
+
+#settingsPanel{
+  display:none;
+}
+
+#settingsPanel.show{
+  display:block;
 }
 
 </style>
@@ -97,12 +104,49 @@ textarea,input{
 <div id="app">
 
   <!-- SIDEBAR -->
-  <div id="sidebar" class="glass">
+  <div id="sidebar">
 
+    <!-- HEADER -->
     <div class="p-6 border-b border-white/10 flex justify-between items-center">
+
       <h1 class="text-4xl font-black">Ultra Notes ✨</h1>
+
+      <!-- SETTINGS BUTTON -->
+      <button onclick="toggleSettings()"
+        class="glass p-3 rounded-xl">
+        ⚙️
+      </button>
+
     </div>
 
+    <!-- SETTINGS PANEL -->
+    <div id="settingsPanel" class="p-5 border-b border-white/10">
+
+      <p class="mb-3 font-bold">Backgrounds</p>
+
+      <div class="flex gap-3 flex-wrap">
+
+        <button onclick="setTheme('linear-gradient(135deg,#ff9a9e,#fad0c4)')"
+          class="w-10 h-10 rounded-full"
+          style="background:linear-gradient(135deg,#ff9a9e,#fad0c4)"></button>
+
+        <button onclick="setTheme('linear-gradient(135deg,#a18cd1,#fbc2eb)')"
+          class="w-10 h-10 rounded-full"
+          style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"></button>
+
+        <button onclick="setTheme('linear-gradient(135deg,#84fab0,#8fd3f4)')"
+          class="w-10 h-10 rounded-full"
+          style="background:linear-gradient(135deg,#84fab0,#8fd3f4)"></button>
+
+        <button onclick="setTheme('linear-gradient(135deg,#fccb90,#d57eeb)')"
+          class="w-10 h-10 rounded-full"
+          style="background:linear-gradient(135deg,#fccb90,#d57eeb)"></button>
+
+      </div>
+
+    </div>
+
+    <!-- CREATE -->
     <div class="p-5">
       <button id="createBtn"
         class="w-full bg-white text-pink-500 p-4 rounded-3xl font-black">
@@ -110,26 +154,23 @@ textarea,input{
       </button>
     </div>
 
+    <!-- NOTES -->
     <div id="notesContainer" class="p-5 space-y-4"></div>
 
   </div>
 
-  <!-- FULLSCREEN EDITOR -->
-  <div id="editor" class="fadeIn">
+  <!-- EDITOR -->
+  <div id="editor">
 
-    <input
-      id="title"
+    <input id="title"
       placeholder="Untitled Note"
       class="text-6xl font-black mb-10"
-      oninput="updateNote()"
-    />
+      oninput="updateNote()" />
 
-    <textarea
-      id="content"
+    <textarea id="content"
       class="h-[75vh] text-2xl resize-none"
-      oninput="updateNote()"
       placeholder="Start writing..."
-    ></textarea>
+      oninput="updateNote()"></textarea>
 
   </div>
 
@@ -144,8 +185,18 @@ function saveNotes(){
   localStorage.setItem("ultraNotes", JSON.stringify(notes));
 }
 
-/* CREATE NOTE */
-document.getElementById("createBtn").addEventListener("click", ()=>{
+/* SETTINGS */
+function toggleSettings(){
+  document.getElementById("settingsPanel")
+  .classList.toggle("show");
+}
+
+function setTheme(color){
+  document.body.style.background = color;
+}
+
+/* CREATE */
+document.getElementById("createBtn").onclick = ()=>{
   const note = {
     id:Date.now(),
     title:"",
@@ -157,9 +208,9 @@ document.getElementById("createBtn").addEventListener("click", ()=>{
   saveNotes();
   renderNotes();
   openNote(note.id);
-});
+};
 
-/* RENDER SIDEBAR */
+/* RENDER */
 function renderNotes(){
 
   const container = document.getElementById("notesContainer");
@@ -182,7 +233,7 @@ function renderNotes(){
   });
 }
 
-/* OPEN FULLSCREEN EDITOR */
+/* OPEN */
 function openNote(id){
 
   selectedNote = notes.find(n=>n.id===id);
@@ -195,22 +246,16 @@ function openNote(id){
   document.getElementById("title").focus();
 }
 
-/* EXIT FULLSCREEN (ESC KEY) */
+/* ESC TO EXIT */
 document.addEventListener("keydown",(e)=>{
-
   if(e.key === "Escape"){
-    closeEditor();
+    document.body.classList.remove("fullscreen");
+    selectedNote = null;
+    renderNotes();
   }
 });
 
-function closeEditor(){
-
-  document.body.classList.remove("fullscreen");
-  selectedNote = null;
-  renderNotes();
-}
-
-/* UPDATE NOTE */
+/* UPDATE */
 function updateNote(){
 
   if(!selectedNote) return;
